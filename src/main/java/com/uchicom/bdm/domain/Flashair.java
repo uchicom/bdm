@@ -25,21 +25,31 @@ public class Flashair {
 	private String fdate;
 	private String ftime;
 	
+	public static void main(String[] args) {
+		List<URL> urlList = getUrlList();
+		urlList.forEach((url)->{System.out.println(url);});
+//		wlansd.push({"r_uri":"", "fname":"DCIM", "fsize":0,"attr":16,"fdate":17181,"ftime":18432});
+//		wlansd.push({"r_uri":"", "fname":"MISC", "fsize":0,"attr":16,"fdate":17713,"ftime":45084});
+// DCIM
+//		wlansd.push({"r_uri":"/DCIM", "fname":"100__TSB", "fsize":0,"attr":16,"fdate":17181,"ftime":18432});
+//		wlansd.push({"r_uri":"/DCIM", "fname":"EOSMISC", "fsize":0,"attr":16,"fdate":17713,"ftime":45084});
+	}
 	public static List<URL> getUrlList() {
 		List<URL> urlList = new ArrayList<>();
 		try {
-			URL url = new URL(urlRoot);
+			URL url = new URL("http://flashair/DCIM/100__TSB");
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			try (InputStream is = url.openStream()) {
 				int length = 0;
 				byte[] bytes = new byte[4 * 1024 * 1024];
-				while ((length = is.read(bytes)) < 0) {
+				while ((length = is.read(bytes)) >= 0) {
 					baos.write(bytes, 0, length);
 				}
 				String html = baos.toString();
 				String[] lines = html.split("\n");
 				for (String line : lines) {
 					if (line.startsWith("wlansd.push")) {
+						System.out.println(line);
 						urlList.add(parse(line.substring(12, line.length() - 2)).toURL());
 					}
 				}
@@ -54,7 +64,7 @@ public class Flashair {
 	
 	public static Flashair parse(String json) {
 		Flashair flashair = new Flashair();;
-		Pattern pattern = Pattern.compile("^\\{\"([^\"]+)\"\\:\"([^\"]+)\", \"([^\"]+)\"\\:\"([^\"]+)\", \"([^\"]+)\"\\:([1234567890]+),\"([^\"]+)\"\\:([1234567890]+),\"([^\"]+)\"\\:([1234567890]+),\"([^\"]+)\"\\:([1234567890]+)\\}$");
+		Pattern pattern = Pattern.compile("^\\{\"([^\"]*)\"\\:\"([^\"]+)\", \"([^\"]+)\"\\:\"([^\"]+)\", \"([^\"]+)\"\\:([1234567890]+),\"([^\"]+)\"\\:([1234567890]+),\"([^\"]+)\"\\:([1234567890]+),\"([^\"]+)\"\\:([1234567890]+)\\}$");
 		Matcher matcher = pattern.matcher(json);
 		if (matcher.find()) {
 			int max = matcher.groupCount();
