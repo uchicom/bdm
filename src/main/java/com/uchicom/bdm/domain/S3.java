@@ -74,7 +74,7 @@ public class S3 {
 	 * @param keys オブジェクトキーの配列
 	 */
 	public void list(String[] keys) {
-		AmazonS3 client = createClient();
+		AmazonS3 client = createClient(false);
 		String bucketName = properties.getProperty("bucket_name");
 		for (String key : keys) {
 			ListObjectsV2Result result = client.listObjectsV2(bucketName, key);
@@ -88,7 +88,7 @@ public class S3 {
 	 * @param keys オブジェクトキーの配列
 	 */
 	public void download(String[] keys) {
-		AmazonS3 client = createClient();
+		AmazonS3 client = createClient(true);
 		String bucketName = properties.getProperty("bucket_name");
 		for (String key : keys) {
 			S3Object object = client.getObject(new GetObjectRequest(bucketName, key));
@@ -104,12 +104,12 @@ public class S3 {
 		}
 	}
 
-	public AmazonS3 createClient() {
+	public AmazonS3 createClient(boolean encryptable) {
 		AmazonS3EncryptionClientV2Builder builder = AmazonS3EncryptionClientV2Builder.standard();
 
 		builder.withClientConfiguration(createConfiguration()).withCredentials(createCredentials())
 				.withRegion(createRegion());
-		if (properties.getProperty("encrypt") != null) {
+		if (encryptable && properties.getProperty("encrypt") != null) {
 			builder.withCryptoConfiguration(createCryptoConfiguration())
 					.withEncryptionMaterialsProvider(createEncryptionMaterialsProvider());
 		}
