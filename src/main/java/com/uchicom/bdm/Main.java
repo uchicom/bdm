@@ -14,7 +14,7 @@ import java.util.List;
 public class Main {
 
 	/**
-	 * @param args
+	 * @param args パラメータ引数
 	 */
 	public static void main(String[] args) {
 		if (args.length != 2) return;
