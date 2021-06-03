@@ -2,7 +2,6 @@ package com.uchicom.bdm.domain;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -64,7 +63,7 @@ public class S3 {
 	/**
 	 * パス配下のリストをファイル出力.
 	 * 
-	 * @param paths
+	 * @param keys オブジェクトキーの配列
 	 */
 	public void list(String[] keys) {
 		var client = createClient();
@@ -78,9 +77,7 @@ public class S3 {
 	/**
 	 * ダウンロードする
 	 * 
-	 * @param paths
-	 * @throws IOException
-	 * @throws FileNotFoundException
+	 * @param keys オブジェクトキーの配列
 	 */
 	public void download(String[] keys) {
 		var client = createClient();
