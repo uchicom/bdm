@@ -1,3 +1,4 @@
+// (c) 2021 uchicom
 package com.uchicom.bdm.domain;
 
 import java.io.File;
@@ -24,6 +25,10 @@ import com.amazonaws.services.s3.model.EncryptionMaterials;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.StaticEncryptionMaterialsProvider;
 
+/**
+ * @author uchicom: Shigeki Uchiyama
+ *
+ */
 public class S3 {
 
 	public static void main(String[] args) {
