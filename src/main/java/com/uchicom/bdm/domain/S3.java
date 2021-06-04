@@ -18,9 +18,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.AmazonS3EncryptionClientV2Builder;
-import com.amazonaws.services.s3.model.CryptoConfigurationV2;
-import com.amazonaws.services.s3.model.CryptoMode;
+import com.amazonaws.services.s3.AmazonS3EncryptionClientBuilder;
 import com.amazonaws.services.s3.model.EncryptionMaterials;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
@@ -128,11 +126,9 @@ public class S3 {
 
     public AmazonS3 createClient(boolean encryptable) {
         if (encryptable && properties.getProperty("encrypt") != null) {
-            return AmazonS3EncryptionClientV2Builder.standard().withClientConfiguration(createConfiguration())
-                    .withCredentials(createCredentials()).withRegion(createRegion())
-                    .withCryptoConfiguration(createCryptoConfiguration())
-                    .withEncryptionMaterialsProvider(createEncryptionMaterialsProvider()).withRegion(createRegion())
-                    .build();
+            return AmazonS3EncryptionClientBuilder.standard().withClientConfiguration(createConfiguration())
+                    .withCredentials(createCredentials()).withEncryptionMaterials(createEncryptionMaterialsProvider())
+                    .withRegion(createRegion()).build();
         } else {
             return AmazonS3ClientBuilder.standard().withClientConfiguration(createConfiguration())
                     .withCredentials(createCredentials()).withRegion(createRegion()).build();
@@ -155,22 +151,7 @@ public class S3 {
     public Regions createRegion() {
         return Regions.valueOf(properties.getProperty("region"));
     }
-
-    public AmazonS3 createClientWithEncrypt() {
-        ClientConfiguration configuration = new ClientConfiguration();
-        configuration.setConnectionTimeout(30_000);
-        configuration.setMaxErrorRetry(3);
-        configuration.setRequestTimeout(30_000);
-        return AmazonS3ClientBuilder.standard().withClientConfiguration(configuration)
-                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(
-                        properties.getProperty("access_key"), properties.getProperty("secret_key"))))
-                .withRegion(Regions.valueOf(properties.getProperty("region"))).build();
-    }
-
-    public CryptoConfigurationV2 createCryptoConfiguration() {
-        return new CryptoConfigurationV2().withCryptoMode(CryptoMode.AuthenticatedEncryption);
-    }
-
+    
     public StaticEncryptionMaterialsProvider createEncryptionMaterialsProvider() {
         return new StaticEncryptionMaterialsProvider(new EncryptionMaterials(new SecretKeySpec(
                 Base64.getDecoder().decode(properties.getProperty("encrypt_key")), properties.getProperty("encrypt"))));
